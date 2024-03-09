@@ -19,7 +19,7 @@ if (mysqli_connect_errno()) {
     resHandler(300, "failure", "database unavailable");
 }
 
-// $_REQUEST used for development / debugging. Remember to change to $_POST for production
+// Prepared statement to update department by id
 $query = $conn->prepare('UPDATE department SET `name` = ?, `locationID` = ?  WHERE `id` = ?');
 $query->bind_param("sii", $name, $locationID, $id);
 

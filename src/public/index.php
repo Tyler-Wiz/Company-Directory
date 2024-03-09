@@ -34,13 +34,11 @@
                 <form id="filterPersonnelForm">
                   <div class="form-floating">
                     <select class="form-select mb-3" id="filterDepartment" placeholder="Department">
-                      <option value="default">Select Department</option>
                     </select>
                     <label for="filterDepartment">Department</label>
                   </div>
                   <div class="form-floating">
                     <select class="form-select" id="filterLocation" placeholder="Department">
-                      <option value="default">Select Location</option>
                     </select>
                     <label for="filterLocation">Location</label>
                   </div>

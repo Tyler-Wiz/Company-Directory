@@ -1,19 +1,20 @@
 <?php
 
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
 include("../config.php");
 include("../function.php");
 
+# Set the response header to JSON
 header('Content-Type: application/json; charset=UTF-8');
 
+# Create connection
 $conn = new mysqli($servername, $username, $password, $database);
 
+# Check connection
 if (mysqli_connect_errno()) {
-
+	# If the connection fails, return an error response
 	$output['status']['code'] = "300";
 	$output['status']['name'] = "failure";
 	$output['status']['description'] = "database unavailable";
@@ -27,14 +28,16 @@ if (mysqli_connect_errno()) {
 	exit;
 }
 
-
+# SQL statement
 $query = 'SELECT d.id, d.name, d.locationID, l.name as location 
           FROM department d 
           LEFT JOIN location l ON (l.id = d.locationID) 
           ORDER BY d.name';
 $result = db($query);
 
+# Check for successful query
 if (!$result) {
+	# If the query fails, return an error response
 	resHandler(400, "executed", "query failed", []);
 }
 
@@ -44,6 +47,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 
 $found = [];
+
+# Check if the user has entered a search term
 if (isset($_POST['txt'])) {
 	$query = $conn->prepare('SELECT `d`.`id`, `d`.`name`, `l`.`id` as `locationID`, `l`.`name` AS `location` 
 	FROM `department` `d`
@@ -75,10 +80,11 @@ if (isset($_POST['txt'])) {
 		array_push($found, $row);
 	}
 
+	# If the search term is found in the database, return the data
 	$data = $found;
 }
 
-
+# Send status and data to client
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";

@@ -1,26 +1,22 @@
 <?php
 
-// example use from browser
-// use insertDepartment.php first to create new dummy record and then specify it's id in the command below
-// http://localhost/companydirectory/libs/php/deleteDepartmentByID.php?id=<id>
-
-// remove next two lines for production
-
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
-// this includes the login details
+# this includes the login details
 include("../config.php");
 include("../function.php");
 
+# Set the response header to JSON
 header('Content-Type: application/json; charset=UTF-8');
 
+# Create connection
 $conn = new mysqli($servername, $username, $password, $database);
 
-if (mysqli_connect_errno()) {
 
+# Check connection
+if (mysqli_connect_errno()) {
+    # If the connection fails, return an error response
     $output['status']['code'] = "300";
     $output['status']['name'] = "failure";
     $output['status']['description'] = "database unavailable";
@@ -34,8 +30,7 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-// SQL statement accepts parameters and so is prepared to avoid SQL injection.
-// $_REQUEST used for development / debugging. Remember to change to $_POST for production
+# Prepared statement to select location count
 $query = $conn->prepare(
     'SELECT l.id, l.name, COUNT(d.locationID) AS location_count
     FROM location l
@@ -51,11 +46,13 @@ if (false === $query) {
 
 $result = $query->get_result();
 
+# Check for successful query and fetch data
 $department = [];
 while ($row = mysqli_fetch_assoc($result)) {
     array_push($department, $row);
 }
 
+# Check for successful query
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";

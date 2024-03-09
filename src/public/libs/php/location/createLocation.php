@@ -1,18 +1,17 @@
 <?php
 
-// remove next two lines for production
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
-
-// this includes the login details
+# this includes the login details
 include("../config.php");
 include("../function.php");
 
+# this includes the login details
 header('Content-Type: application/json; charset=UTF-8');
 
+# this includes the login details
 $conn = new mysqli($servername, $username, $password, $database);
 
 $executionStartTime = microtime(true);
+
 
 if (mysqli_connect_errno()) {
     $output['status']['code'] = "300";
@@ -28,11 +27,10 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-// SQL statement accepts parameters and so is prepared to avoid SQL injection.
-// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
+# Prepared statement
 $query = $conn->prepare('INSERT INTO location (name) VALUES(?)');
-$query->bind_param("s", $_REQUEST['name']);
+$query->bind_param("s", $_POST['name']);
 $query->execute();
 
 if (false === $query) {
@@ -49,12 +47,15 @@ if (false === $query) {
     exit;
 }
 
+# Send Success Response to client
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 $output['data'] = [];
 
+# Close the connection
 mysqli_close($conn);
 
+# Send the output to the client
 echo json_encode($output);
