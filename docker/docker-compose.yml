@@ -1,18 +1,29 @@
 version: '3.8'
 
 services:
-  app:
+  company:
     build:
-      context: ./
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./company/Dockerfile
     container_name: company-app
     restart: always
     working_dir: /var/www/
     volumes:
       - ../src:/var/www
+  gym:
+    build:
+      context: .
+      dockerfile: ./gym/Dockerfile
+    container_name: gym-app
+    restart: always
+    working_dir: /var/www/
+    ports:
+      - 8080:80
+    volumes:
+      - ../src:/var/www
   nginx:
     image: nginx:1.19-alpine
-    container_name: company-app-nginx
+    container_name: nginx
     restart: always
     ports:
       - 8000:80

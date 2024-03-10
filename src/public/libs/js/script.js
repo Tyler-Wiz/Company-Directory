@@ -39,9 +39,12 @@ function createPersonnelModal() {
 $("#addPersonnelModal").on("show.bs.modal", function (event) {
   // Perform any actions you need when the modal is about to be shown
   $.ajax({
-    url: "libs/php/department/getAllDepartments.php",
-    type: "GET",
+    url: "libs/php/controllers/departmentHandler.php",
+    type: "POST",
     dataType: "json",
+    data: {
+      action: "read",
+    },
     success: function (result) {
       // get the status code
       var resultCode = result.status.code;
@@ -85,7 +88,7 @@ $("#addPersonnelForm").on("submit", function (e) {
 
   // Make an AJAX request to the server
   $.ajax({
-    url: "libs/php/personnel/createPersonnel.php",
+    url: "libs/php/controllers/personnelHandler.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -94,6 +97,7 @@ $("#addPersonnelForm").on("submit", function (e) {
       jobTitle: jobTitle,
       email: email,
       departmentID: departmentID,
+      action: "create",
     },
     // if the request is successful
     success: function (result) {
@@ -119,11 +123,12 @@ $("#addPersonnelForm").on("submit", function (e) {
 // Read all personnel
 function getAllPersonnel() {
   $.ajax({
-    url: "libs/php/personnel/getAll.php",
+    url: "libs/php/controllers/personnelHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       txt: $("#searchInp").val().toLowerCase(),
+      action: "read",
     },
     success: function (result) {
       // clear the table
@@ -196,11 +201,12 @@ $("#personnelBtn").click(function () {
 // Update Personnel Modal - Get personnel by ID
 $("#editPersonnelModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/personnel/getPersonnelByID.php",
+    url: "libs/php/controllers/personnelHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $(e.relatedTarget).attr("data-id"),
+      action: "readByID",
     },
     success: function (result) {
       // get the status code
@@ -249,7 +255,7 @@ $("#editPersonnelForm").on("submit", function (e) {
   const departmentID = $("#editPersonnelDepartment").val();
   // Make an AJAX request to the server
   $.ajax({
-    url: "libs/php/personnel/updatePersonnelByID.php",
+    url: "libs/php/controllers/personnelHandler.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -259,6 +265,7 @@ $("#editPersonnelForm").on("submit", function (e) {
       jobTitle: jobTitle,
       email: email,
       departmentID: departmentID,
+      action: "update",
     },
     success: function (result) {
       var resultCode = result.status.code;
@@ -271,7 +278,11 @@ $("#editPersonnelForm").on("submit", function (e) {
         getAllPersonnel();
       } else {
         // Display an error message
-        showToast("Error updating personnel", 5000, "red");
+        showToast(
+          "Error updating personnel, Please Edit Personnel",
+          5000,
+          "red"
+        );
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -284,11 +295,12 @@ $("#editPersonnelForm").on("submit", function (e) {
 $("#deletePersonnelModal").on("show.bs.modal", function (e) {
   // Make an AJAX request to the server
   $.ajax({
-    url: "libs/php/personnel/getPersonnelByID.php",
+    url: "libs/php/controllers/personnelHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $(e.relatedTarget).attr("data-id"),
+      action: "readByID",
     },
     success: function (result) {
       // get the status code
@@ -315,6 +327,7 @@ $("#deletePersonnelModal").on("show.bs.modal", function (e) {
     },
   });
 });
+
 // Delete Personnel Form
 $("#deletePersonnelForm").on("submit", function (e) {
   // Prevent the default form submission
@@ -323,11 +336,12 @@ $("#deletePersonnelForm").on("submit", function (e) {
   const id = $("#deletePersonnelEmployeeID").val();
   // Make an AJAX request to the server
   $.ajax({
-    url: "libs/php/personnel/deletePersonnelByID.php",
+    url: "libs/php/controllers/personnelHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: id,
+      action: "delete",
     },
     success: function (result) {
       var resultCode = result.status.code;
@@ -335,7 +349,7 @@ $("#deletePersonnelForm").on("submit", function (e) {
         // Close the modal
         $("#deletePersonnelModal").modal("hide");
         // Display a success message
-        showToast("Personnel deleted successfully", 5000, "green");
+        showToast(result.status.description, 5000, "green");
         // Refresh personnel table
         getAllPersonnel();
       } else {
@@ -365,12 +379,17 @@ function createDepartmentModal() {
 $("#addDepartmentModal").on("show.bs.modal", function (event) {
   // Perform any actions you need when the modal is about to be shown
   $.ajax({
-    url: "libs/php/location/getAllLocations.php",
-    type: "GET",
+    url: "libs/php/controllers/locationHandler.php",
+    type: "POST",
     dataType: "json",
+    data: {
+      action: "read",
+    },
     success: function (result) {
       var resultCode = result.status.code;
       if (resultCode == 200) {
+        // empty table before appending new data
+        $("#addDepartmentLocation").empty();
         result.data.forEach((location) => {
           // loop through the result and display the Location List in select input
           $("#addDepartmentLocation").append(
@@ -395,12 +414,13 @@ $("#addDepartmentForm").on("submit", function (e) {
   const name = $("#addDepartmentName").val();
   const locationID = $("#addDepartmentLocation").val();
   $.ajax({
-    url: "libs/php/department/createDepartment.php",
+    url: "libs/php/controllers/departmentHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       name: name,
       locationID: locationID,
+      action: "create",
     },
     success: function (result) {
       var resultCode = result.status.code;
@@ -424,11 +444,12 @@ $("#addDepartmentForm").on("submit", function (e) {
 
 function getAllDepartments() {
   $.ajax({
-    url: "libs/php/department/getAllDepartments.php",
+    url: "libs/php/controllers/departmentHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       txt: $("#searchInp").val().toLowerCase(),
+      action: "read",
     },
     success: function (result) {
       $("#departmentTable").empty();
@@ -489,11 +510,12 @@ $("#departmentsBtn").click(function () {
 // Update Department Modal - Get Department by ID
 $("#editDepartmentModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/department/getDepartmentByID.php",
+    url: "libs/php/controllers/departmentHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $(e.relatedTarget).attr("data-id"),
+      action: "readByID",
     },
     success: function (result) {
       console.log(result);
@@ -525,13 +547,14 @@ $("#editDepartmentForm").on("submit", function (e) {
   const locationID = $("#editDepartmentLocation").val();
 
   $.ajax({
-    url: "libs/php/department/updateDepartmentByID.php",
+    url: "libs/php/controllers/departmentHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: id,
       name: name,
       locationID: locationID,
+      action: "update",
     },
     success: function (result) {
       var resultCode = result.status.code;
@@ -551,11 +574,12 @@ $("#editDepartmentForm").on("submit", function (e) {
 // Delete Department Modal - Get Department by ID
 $("#deleteDepartmentModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/department/getPersonnelCount.php",
+    url: "libs/php/controllers/departmentHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $(e.relatedTarget).attr("data-id"),
+      action: "count",
     },
     success: function (result) {
       var resultCode = result.status.code;
@@ -592,11 +616,12 @@ $("#deleteDepartmentForm").on("submit", function (e) {
   e.preventDefault();
   const id = $("#deleteDepartmentID").val();
   $.ajax({
-    url: "libs/php/department/deleteDepartmentByID.php",
+    url: "libs/php/controllers/departmentHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: id,
+      action: "delete",
     },
     success: function (result) {
       var resultCode = result.status.code;
@@ -604,7 +629,7 @@ $("#deleteDepartmentForm").on("submit", function (e) {
         // Close the modal
         $("#deleteDepartmentModal").modal("hide");
         // Display a success message
-        showToast("Personnel deleted successfully", 5000, "green");
+        showToast(result.status.description, 5000, "green");
         // Refresh personnel table
         getAllDepartments();
       } else {
@@ -631,18 +656,19 @@ $("#addLocationForm").on("submit", function (e) {
   e.preventDefault();
   const name = $("#addLocationName").val();
   $.ajax({
-    url: "libs/php/location/createLocation.php",
+    url: "libs/php/controllers/locationHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       name: name,
+      action: "create",
     },
     success: function (result) {
       var resultCode = result.status.code;
       if (resultCode == 200) {
         // Refresh location table
         $("#addLocationModal").modal("hide");
-        showToast("Location added successfully", 5000, "green");
+        showToast(result.status.description, 5000, "green");
         getAllLocations();
       } else {
         // Display an error message
@@ -664,11 +690,12 @@ $("#locationsBtn").click(function () {
 // Read all locations
 function getAllLocations() {
   $.ajax({
-    url: "libs/php/location/getAllLocations.php",
+    url: "libs/php/controllers/locationHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       txt: $("#searchInp").val().toLowerCase(),
+      action: "read",
     },
     success: function (result) {
       $("#locationTable").empty();
@@ -702,7 +729,7 @@ function getAllLocations() {
         });
       } else {
         // Display an error message
-        showToast("Error deleting personnel", 5000, "red");
+        showToast(result.status.description, 5000, "red");
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -714,11 +741,12 @@ function getAllLocations() {
 // Update Location Modal - Get Location by ID
 $("#editLocationModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/location/getLocationByID.php",
+    url: "libs/php/controllers/locationHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $(e.relatedTarget).attr("data-id"),
+      action: "readByID",
     },
     success: function (result) {
       const resultCode = result.status.code;
@@ -727,7 +755,7 @@ $("#editLocationModal").on("show.bs.modal", function (e) {
         $("#editLocationName").val(result.data[0].name);
       } else {
         // Display an error message
-        showToast("Error deleting personnel", 5000, "red");
+        showToast(result.status.description, 5000, "red");
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -742,12 +770,13 @@ $("#editLocationForm").on("submit", function (e) {
   const id = $("#editLocationID").val();
   const name = $("#editLocationName").val();
   $.ajax({
-    url: "libs/php/location/updateLocationByID.php",
+    url: "libs/php/controllers/locationHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: id,
       name: name,
+      action: "update",
     },
     success: function (result) {
       var resultCode = result.status.code;
@@ -755,12 +784,12 @@ $("#editLocationForm").on("submit", function (e) {
         // Close the modal
         $("#editLocationModal").modal("hide");
         // Display a success message
-        showToast("Location updated successfully", 5000, "green");
+        showToast(result.status.description, 5000, "green");
         // Refresh location table
         getAllLocations();
       } else {
         // Display an error message
-        showToast("Error updating location", 5000, "red");
+        showToast(result.status.description, 5000, "red");
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -772,11 +801,12 @@ $("#editLocationForm").on("submit", function (e) {
 // Delete Department Modal - Get Department by ID
 $("#deleteLocationModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/location/getLocationCount.php",
+    url: "libs/php/controllers/locationHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $(e.relatedTarget).attr("data-id"),
+      action: "count",
     },
     success: function (result) {
       // get the status code
@@ -815,11 +845,12 @@ $("#deleteLocationForm").on("submit", function (e) {
   e.preventDefault();
   // Get the form values
   $.ajax({
-    url: "libs/php/location/deleteLocationByID.php",
+    url: "libs/php/controllers/locationHandler.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $("#deleteLocationID").val(),
+      action: "delete",
     },
     success: function (result) {
       var resultCode = result.status.code;
@@ -827,12 +858,12 @@ $("#deleteLocationForm").on("submit", function (e) {
         // Close the modal
         $("#deleteLocationModal").modal("hide");
         // Display a success message
-        showToast("Location deleted successfully", 5000, "green");
+        showToast(result.status.description, 5000, "green");
         // Refresh location table
         getAllLocations();
       } else {
         // Display an error message
-        showToast("Error deleting location", 5000, "red");
+        showToast(result.status.description, 5000, "red");
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -876,8 +907,11 @@ $("#filterBtn").click(function () {
 // Filter Personnel Modal
 $("#filterModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/department/getAllDepartments.php",
-    type: "GET",
+    url: "libs/php/controllers/departmentHandler.php",
+    type: "POST",
+    data: {
+      action: "read",
+    },
     dataType: "json",
     success: function (result) {
       var resultCode = result.status.code;
@@ -898,8 +932,11 @@ $("#filterModal").on("show.bs.modal", function (e) {
         });
         // Make an AJAX request to the server
         $.ajax({
-          url: "libs/php/location/getAllLocations.php",
-          type: "GET",
+          url: "libs/php/controllers/locationHandler.php",
+          type: "POST",
+          data: {
+            action: "read",
+          },
           dataType: "json",
           success: function (result) {
             var resultCode = result.status.code;
