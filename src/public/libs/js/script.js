@@ -77,14 +77,7 @@ $("#addPersonnelForm").on("submit", function (e) {
   const lastName = $("#addPersonnelLastName").val();
   const email = $("#addPersonnelEmailAddress").val();
   const departmentID = $("#addPersonnelDepartment").val();
-
-  // Check if the job title is empty
-  let jobTitle;
-  if ($("#addPersonnelJobTitle").val() == "") {
-    jobTitle = "N/A";
-  } else {
-    jobTitle = $("#addPersonnelJobTitle").val();
-  }
+  const jobTitle = $("#addPersonnelJobTitle").val();
 
   // Make an AJAX request to the server
   $.ajax({
@@ -231,9 +224,7 @@ $("#editPersonnelModal").on("show.bs.modal", function (e) {
           result.data.personnel[0].departmentID
         );
       } else {
-        $("#editPersonnelModal .modal-title").replaceWith(
-          "Error retrieving data"
-        );
+        showToast("Error retrieving data", 5000, "red");
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {

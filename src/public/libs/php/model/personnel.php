@@ -22,7 +22,7 @@ class Personnel
         # Prepare the SQL statement
         $query = 'INSERT INTO personnel (firstName, lastName, email, jobTitle, departmentID) VALUES(?,?,?,?,?)';
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("sssii", $firstName, $lastName, $email, $jobTitle, $departmentID);
+        $stmt->bind_param("ssssi", $firstName, $lastName, $email, $jobTitle, $departmentID);
 
         # Set the values for the parameters
         $firstName = $_POST['firstName'];
@@ -144,7 +144,7 @@ class Personnel
         # Prepare the SQL statement
         $query = 'UPDATE personnel SET firstName = ?, lastName = ?, email = ?, jobTitle = ?, departmentID = ? WHERE id = ?';
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("sssiii", $firstName, $lastName, $email, $jobTitle, $departmentID, $id);
+        $stmt->bind_param("ssssii", $firstName, $lastName, $email, $jobTitle, $departmentID, $id);
 
         # Set the values for the parameters
         $firstName = $_POST['firstName'];
