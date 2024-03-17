@@ -39,11 +39,11 @@ function createPersonnelModal() {
 $("#addPersonnelModal").on("show.bs.modal", function (event) {
   // Perform any actions you need when the modal is about to be shown
   $.ajax({
-    url: "libs/php/controllers/departmentHandler.php",
+    url: "libs/php/views/department.view.php",
     type: "POST",
     dataType: "json",
     data: {
-      action: "read",
+      action: "getAll",
     },
     success: function (result) {
       // get the status code
@@ -81,7 +81,7 @@ $("#addPersonnelForm").on("submit", function (e) {
 
   // Make an AJAX request to the server
   $.ajax({
-    url: "libs/php/controllers/personnelHandler.php",
+    url: "libs/php/views/personnel.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -116,27 +116,25 @@ $("#addPersonnelForm").on("submit", function (e) {
 // Read all personnel
 function getAllPersonnel() {
   $.ajax({
-    url: "libs/php/controllers/personnelHandler.php",
+    url: "libs/php/views/personnel.view.php",
     type: "POST",
     dataType: "json",
     data: {
       txt: $("#searchInp").val().toLowerCase(),
-      action: "read",
+      action: "getAll",
     },
     success: function (result) {
       // clear the table
       $("#personnelTable").empty();
       var resultCode = result.status.code;
-      if (resultCode == 200) {
-        // check if the result is empty
-        if (result.data.length == 0) {
-          $("#personnelTable").append(
-            `<tr>
+      if (resultCode == 404) {
+        $("#personnelTable").append(
+          `<tr>
              <td class="text-center" colspan="6">
               <h5>No Personnel found</h5>
              </td></tr>`
-          );
-        }
+        );
+      } else if (resultCode == 200) {
         // loop through the result and display the data in the table
         result.data.forEach((personnel) => {
           $("#personnelTable").append(
@@ -194,12 +192,12 @@ $("#personnelBtn").click(function () {
 // Update Personnel Modal - Get personnel by ID
 $("#editPersonnelModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/controllers/personnelHandler.php",
+    url: "libs/php/views/personnel.view.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $(e.relatedTarget).attr("data-id"),
-      action: "readByID",
+      action: "getById",
     },
     success: function (result) {
       // get the status code
@@ -224,7 +222,9 @@ $("#editPersonnelModal").on("show.bs.modal", function (e) {
           result.data.personnel[0].departmentID
         );
       } else {
-        showToast("Error retrieving data", 5000, "red");
+        $("#editPersonnelModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -246,7 +246,7 @@ $("#editPersonnelForm").on("submit", function (e) {
   const departmentID = $("#editPersonnelDepartment").val();
   // Make an AJAX request to the server
   $.ajax({
-    url: "libs/php/controllers/personnelHandler.php",
+    url: "libs/php/views/personnel.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -269,11 +269,7 @@ $("#editPersonnelForm").on("submit", function (e) {
         getAllPersonnel();
       } else {
         // Display an error message
-        showToast(
-          "Error updating personnel, Please Edit Personnel",
-          5000,
-          "red"
-        );
+        showToast("Error updating personnel", 5000, "red");
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -286,12 +282,12 @@ $("#editPersonnelForm").on("submit", function (e) {
 $("#deletePersonnelModal").on("show.bs.modal", function (e) {
   // Make an AJAX request to the server
   $.ajax({
-    url: "libs/php/controllers/personnelHandler.php",
+    url: "libs/php/views/personnel.view.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $(e.relatedTarget).attr("data-id"),
-      action: "readByID",
+      action: "getById",
     },
     success: function (result) {
       // get the status code
@@ -318,7 +314,6 @@ $("#deletePersonnelModal").on("show.bs.modal", function (e) {
     },
   });
 });
-
 // Delete Personnel Form
 $("#deletePersonnelForm").on("submit", function (e) {
   // Prevent the default form submission
@@ -327,7 +322,7 @@ $("#deletePersonnelForm").on("submit", function (e) {
   const id = $("#deletePersonnelEmployeeID").val();
   // Make an AJAX request to the server
   $.ajax({
-    url: "libs/php/controllers/personnelHandler.php",
+    url: "libs/php/views/personnel.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -340,7 +335,7 @@ $("#deletePersonnelForm").on("submit", function (e) {
         // Close the modal
         $("#deletePersonnelModal").modal("hide");
         // Display a success message
-        showToast(result.status.description, 5000, "green");
+        showToast("Personnel deleted successfully", 5000, "green");
         // Refresh personnel table
         getAllPersonnel();
       } else {
@@ -370,17 +365,15 @@ function createDepartmentModal() {
 $("#addDepartmentModal").on("show.bs.modal", function (event) {
   // Perform any actions you need when the modal is about to be shown
   $.ajax({
-    url: "libs/php/controllers/locationHandler.php",
+    url: "libs/php/views/location.view.php",
     type: "POST",
     dataType: "json",
     data: {
-      action: "read",
+      action: "getAll",
     },
     success: function (result) {
       var resultCode = result.status.code;
       if (resultCode == 200) {
-        // empty table before appending new data
-        $("#addDepartmentLocation").empty();
         result.data.forEach((location) => {
           // loop through the result and display the Location List in select input
           $("#addDepartmentLocation").append(
@@ -405,7 +398,7 @@ $("#addDepartmentForm").on("submit", function (e) {
   const name = $("#addDepartmentName").val();
   const locationID = $("#addDepartmentLocation").val();
   $.ajax({
-    url: "libs/php/controllers/departmentHandler.php",
+    url: "libs/php/views/department.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -435,25 +428,24 @@ $("#addDepartmentForm").on("submit", function (e) {
 
 function getAllDepartments() {
   $.ajax({
-    url: "libs/php/controllers/departmentHandler.php",
+    url: "libs/php/views/department.view.php",
     type: "POST",
     dataType: "json",
     data: {
       txt: $("#searchInp").val().toLowerCase(),
-      action: "read",
+      action: "getAll",
     },
     success: function (result) {
       $("#departmentTable").empty();
-      if (result.data.length == 0) {
+      var resultCode = result.status.code;
+      if (resultCode == 404) {
         $("#departmentTable").append(
           `<tr>
              <td class="text-center" colspan="6">
               <h5>No Department found</h5>
              </td></tr>`
         );
-      }
-      var resultCode = result.status.code;
-      if (resultCode == 200) {
+      } else if (resultCode == 200) {
         // loop through the result and display the data in the table
         result.data.forEach((department) => {
           $("#departmentTable").append(
@@ -501,12 +493,12 @@ $("#departmentsBtn").click(function () {
 // Update Department Modal - Get Department by ID
 $("#editDepartmentModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/controllers/departmentHandler.php",
+    url: "libs/php/views/department.view.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $(e.relatedTarget).attr("data-id"),
-      action: "readByID",
+      action: "getById",
     },
     success: function (result) {
       console.log(result);
@@ -538,7 +530,7 @@ $("#editDepartmentForm").on("submit", function (e) {
   const locationID = $("#editDepartmentLocation").val();
 
   $.ajax({
-    url: "libs/php/controllers/departmentHandler.php",
+    url: "libs/php/views/department.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -565,7 +557,7 @@ $("#editDepartmentForm").on("submit", function (e) {
 // Delete Department Modal - Get Department by ID
 $("#deleteDepartmentModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/controllers/departmentHandler.php",
+    url: "libs/php/views/department.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -574,26 +566,25 @@ $("#deleteDepartmentModal").on("show.bs.modal", function (e) {
     },
     success: function (result) {
       var resultCode = result.status.code;
-      if (resultCode == 200) {
-        // set the form values
-        $("#deleteDepartmentID").val(result.data[0].id);
-        //  check if the department has personnel if yes! display the personnel count
-        // and the department name and Don't allow the user to delete the department
-        if (result.data[0].personnel_count > 0) {
-          $("#departmentName").html(result.data[0].name);
-          $("#employeeCount").html(result.data[0].personnel_count);
-          $("#filledDepartment").show();
-          $("#filledDeptMessage").show();
-          $("#emptyDepartment").hide();
-          $("#emptyDeptMessage").hide();
-          // if the department has no personnel display the department name and Allow the user to delete the department
-        } else {
-          $("#emptyDepartmentName").html(result.data[0].name);
-          $("#emptyDeptMessage").show();
-          $("#emptyDepartment").show();
-          $("#filledDepartment").hide();
-          $("#filledDeptMessage").hide();
-        }
+      console.log(result);
+      // set the form values
+      $("#deleteDepartmentID").val(result.data[0].id);
+      //  check if the department has personnel if yes! display the personnel count
+      // and the department name and Don't allow the user to delete the department
+      if (resultCode == 403) {
+        $("#departmentName").html(result.data[0].name);
+        $("#employeeCount").html(result.data[0].personnel_count);
+        $("#filledDepartment").show();
+        $("#filledDeptMessage").show();
+        $("#emptyDepartment").hide();
+        $("#emptyDeptMessage").hide();
+        // if the department has no personnel display the department name and Allow the user to delete the department
+      } else {
+        $("#emptyDepartmentName").html(result.data[0].name);
+        $("#emptyDeptMessage").show();
+        $("#emptyDepartment").show();
+        $("#filledDepartment").hide();
+        $("#filledDeptMessage").hide();
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -607,7 +598,7 @@ $("#deleteDepartmentForm").on("submit", function (e) {
   e.preventDefault();
   const id = $("#deleteDepartmentID").val();
   $.ajax({
-    url: "libs/php/controllers/departmentHandler.php",
+    url: "libs/php/views/department.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -620,7 +611,7 @@ $("#deleteDepartmentForm").on("submit", function (e) {
         // Close the modal
         $("#deleteDepartmentModal").modal("hide");
         // Display a success message
-        showToast(result.status.description, 5000, "green");
+        showToast("Personnel deleted successfully", 5000, "green");
         // Refresh personnel table
         getAllDepartments();
       } else {
@@ -647,7 +638,7 @@ $("#addLocationForm").on("submit", function (e) {
   e.preventDefault();
   const name = $("#addLocationName").val();
   $.ajax({
-    url: "libs/php/controllers/locationHandler.php",
+    url: "libs/php/views/location.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -659,7 +650,7 @@ $("#addLocationForm").on("submit", function (e) {
       if (resultCode == 200) {
         // Refresh location table
         $("#addLocationModal").modal("hide");
-        showToast(result.status.description, 5000, "green");
+        showToast("Location added successfully", 5000, "green");
         getAllLocations();
       } else {
         // Display an error message
@@ -681,17 +672,24 @@ $("#locationsBtn").click(function () {
 // Read all locations
 function getAllLocations() {
   $.ajax({
-    url: "libs/php/controllers/locationHandler.php",
+    url: "libs/php/views/location.view.php",
     type: "POST",
     dataType: "json",
     data: {
       txt: $("#searchInp").val().toLowerCase(),
-      action: "read",
+      action: "getAll",
     },
     success: function (result) {
       $("#locationTable").empty();
       var resultCode = result.status.code;
-      if (resultCode == 200) {
+      if (resultCode == 404) {
+        $("#locationTable").append(
+          `<tr>
+             <td class="text-center" colspan="6">
+              <h5>No Location found</h5>
+             </td></tr>`
+        );
+      } else if (resultCode == 200) {
         // loop through the result and display the data in the table
         result.data.forEach((location) => {
           $("#locationTable").append(
@@ -720,7 +718,7 @@ function getAllLocations() {
         });
       } else {
         // Display an error message
-        showToast(result.status.description, 5000, "red");
+        showToast("Error deleting personnel", 5000, "red");
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -732,12 +730,12 @@ function getAllLocations() {
 // Update Location Modal - Get Location by ID
 $("#editLocationModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/controllers/locationHandler.php",
+    url: "libs/php/views/location.view.php",
     type: "POST",
     dataType: "json",
     data: {
       id: $(e.relatedTarget).attr("data-id"),
-      action: "readByID",
+      action: "getByID",
     },
     success: function (result) {
       const resultCode = result.status.code;
@@ -746,7 +744,7 @@ $("#editLocationModal").on("show.bs.modal", function (e) {
         $("#editLocationName").val(result.data[0].name);
       } else {
         // Display an error message
-        showToast(result.status.description, 5000, "red");
+        showToast("Error deleting personnel", 5000, "red");
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -761,7 +759,7 @@ $("#editLocationForm").on("submit", function (e) {
   const id = $("#editLocationID").val();
   const name = $("#editLocationName").val();
   $.ajax({
-    url: "libs/php/controllers/locationHandler.php",
+    url: "libs/php/views/location.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -770,17 +768,18 @@ $("#editLocationForm").on("submit", function (e) {
       action: "update",
     },
     success: function (result) {
+      console.log(result);
       var resultCode = result.status.code;
       if (resultCode == 200) {
         // Close the modal
         $("#editLocationModal").modal("hide");
         // Display a success message
-        showToast(result.status.description, 5000, "green");
+        showToast("Location updated successfully", 5000, "green");
         // Refresh location table
         getAllLocations();
       } else {
         // Display an error message
-        showToast(result.status.description, 5000, "red");
+        showToast("Error updating location", 5000, "red");
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -789,10 +788,10 @@ $("#editLocationForm").on("submit", function (e) {
   });
 });
 
-// Delete Department Modal - Get Department by ID
+// Delete Location Modal - Get Department by ID
 $("#deleteLocationModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/controllers/locationHandler.php",
+    url: "libs/php/views/location.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -800,28 +799,25 @@ $("#deleteLocationModal").on("show.bs.modal", function (e) {
       action: "count",
     },
     success: function (result) {
+      $("#deleteLocationID").val(result.data[0].id);
       // get the status code
       var resultCode = result.status.code;
-      if (resultCode == 200) {
-        // set the form values
-        $("#deleteLocationID").val(result.data[0].id);
+      if (resultCode == 403) {
         /* check if the location has personnel if yes! display the personnel
         count and the location name and Don't allow the user to delete the location */
-        if (result.data[0].location_count > 0) {
-          $("#locationName").html(result.data[0].name);
-          $("#locationCount").html(result.data[0].location_count);
-          $("#filledLocation").show();
-          $("#filledLocationMessage").show();
-          $("#emptyLocation").hide();
-          $("#emptyLocationMessage").hide();
-        } else {
-          // if the location has no personnel display the location name and Allow the user to delete the location
-          $("#emptyLocationName").html(result.data[0].name);
-          $("#emptyLocationMessage").show();
-          $("#emptyLocation").show();
-          $("#filledLocation").hide();
-          $("#filledLocationMessage").hide();
-        }
+        $("#locationName").html(result.data[0].name);
+        $("#locationCount").html(result.data[0].location_count);
+        $("#filledLocation").show();
+        $("#filledLocationMessage").show();
+        $("#emptyLocation").hide();
+        $("#emptyLocationMessage").hide();
+      } else {
+        // if the location has no personnel display the location name and Allow the user to delete the location
+        $("#emptyLocationName").html(result.data[0].name);
+        $("#emptyLocationMessage").show();
+        $("#emptyLocation").show();
+        $("#filledLocation").hide();
+        $("#filledLocationMessage").hide();
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -836,7 +832,7 @@ $("#deleteLocationForm").on("submit", function (e) {
   e.preventDefault();
   // Get the form values
   $.ajax({
-    url: "libs/php/controllers/locationHandler.php",
+    url: "libs/php/views/location.view.php",
     type: "POST",
     dataType: "json",
     data: {
@@ -849,12 +845,12 @@ $("#deleteLocationForm").on("submit", function (e) {
         // Close the modal
         $("#deleteLocationModal").modal("hide");
         // Display a success message
-        showToast(result.status.description, 5000, "green");
+        showToast("Location deleted successfully", 5000, "green");
         // Refresh location table
         getAllLocations();
       } else {
         // Display an error message
-        showToast(result.status.description, 5000, "red");
+        showToast("Error deleting location", 5000, "red");
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -898,12 +894,12 @@ $("#filterBtn").click(function () {
 // Filter Personnel Modal
 $("#filterModal").on("show.bs.modal", function (e) {
   $.ajax({
-    url: "libs/php/controllers/departmentHandler.php",
+    url: "libs/php/views/department.view.php",
     type: "POST",
-    data: {
-      action: "read",
-    },
     dataType: "json",
+    data: {
+      action: "getAll",
+    },
     success: function (result) {
       var resultCode = result.status.code;
       if (resultCode == 200) {
@@ -923,12 +919,12 @@ $("#filterModal").on("show.bs.modal", function (e) {
         });
         // Make an AJAX request to the server
         $.ajax({
-          url: "libs/php/controllers/locationHandler.php",
+          url: "libs/php/views/location.view.php",
           type: "POST",
-          data: {
-            action: "read",
-          },
           dataType: "json",
+          data: {
+            action: "getAll",
+          },
           success: function (result) {
             var resultCode = result.status.code;
             if (resultCode == 200) {

@@ -18,8 +18,7 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-function db($query)
-{
+function db($query) {
     global $conn;
     $result = $conn->query($query);
     if (!$result) {
@@ -29,8 +28,7 @@ function db($query)
 }
 
 
-function resHandler($code, $name, $desc, $data = null)
-{
+function resHandler($code, $name, $desc, $data = null) {
     global $conn;
 
     $executionStartTime = microtime(true);

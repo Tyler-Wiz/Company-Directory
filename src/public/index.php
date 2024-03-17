@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="./libs/img/favicon.ico" type="image/x-icon" />
   <!-- bootstrap -->
   <link rel="stylesheet" href="vendors/bootstrap/css/bootstrap.min.css" />
   <!-- fontAwesome -->
@@ -15,7 +16,9 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="libs/css/styles.css" />
-  <title>Document</title>
+
+
+  <title>Company Directory</title>
 </head>
 
 <body>
@@ -124,7 +127,7 @@
     <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content shadow">
         <div class="modal-header bg-success bg-gradient text-white">
-          <h5 class="modal-title">Add employee</h5>
+          <h5 class="modal-title">Add Personnel</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">

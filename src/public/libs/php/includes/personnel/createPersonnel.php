@@ -21,7 +21,7 @@ if (mysqli_connect_errno()) {
 
 # Prepare the SQL statement
 $query = $conn->prepare('INSERT INTO personnel (firstName, lastName, email, jobTitle, departmentID) VALUES(?,?,?,?,?)');
-$query->bind_param("sssii", $firstName, $lastName, $email, $jobTitle, $departmentID);
+$query->bind_param("ssssi", $firstName, $lastName, $email, $jobTitle, $departmentID);
 
 # Set the values for the parameters
 $firstName = $_POST['firstName'];
